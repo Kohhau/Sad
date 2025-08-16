@@ -1,0 +1,14 @@
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.AssemblyInfoInputs.cache
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.AssemblyInfo.cs
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.csproj.CoreCompileInputs.cache
+c:\Users\User\Downloads\Sad\bin\Debug\net9.0\Sad.exe
+c:\Users\User\Downloads\Sad\bin\Debug\net9.0\Sad.deps.json
+c:\Users\User\Downloads\Sad\bin\Debug\net9.0\Sad.runtimeconfig.json
+c:\Users\User\Downloads\Sad\bin\Debug\net9.0\Sad.dll
+c:\Users\User\Downloads\Sad\bin\Debug\net9.0\Sad.pdb
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.dll
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\refint\Sad.dll
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.pdb
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.genruntimeconfig.cache
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\ref\Sad.dll
