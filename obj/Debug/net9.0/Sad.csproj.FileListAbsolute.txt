@@ -12,3 +12,4 @@ c:\Users\User\Downloads\Sad\obj\Debug\net9.0\refint\Sad.dll
 c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.pdb
 c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.genruntimeconfig.cache
 c:\Users\User\Downloads\Sad\obj\Debug\net9.0\ref\Sad.dll
+c:\Users\User\Downloads\Sad\obj\Debug\net9.0\Sad.sourcelink.json

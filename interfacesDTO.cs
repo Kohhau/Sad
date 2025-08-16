@@ -1,41 +1,51 @@
 using OrderAlReady.Models;
+using System.Collections.Generic;
 
 namespace OrderAlReady
 {
-    // --- Data Transfer Object (DTO) ---
-    // A simple class to carry data for the create request.
-    public class CreateStaffRequestDto
+    // --- Enum for Specifying User Type ---
+    public enum UserType
+    {
+        Student,
+        Staff,
+        PriorityStudent
+    }
+
+    // --- Data Transfer Objects (DTOs) and Result Objects ---
+    public class UserCreationData
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        public int AssignedStallId { get; set; }
+        public int? AssignedStallId { get; set; } // Nullable, as it's only for Staff
     }
 
-    // --- Result Objects ---
-    // Used to return complex results from the service.
-    public class CreateStaffResult
+    public class CreateUserResult
     {
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; }
-        public FoodStallStaff CreatedStaff { get; set; }
+        public User CreatedUser { get; set; }
     }
-    
-    public class DeleteStaffResult
+
+    public class DeleteUserResult
     {
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; }
     }
 
+    public class SuspendUserResult
+    {
+        public bool IsSuccess { get; set; }
+        public string ErrorMessage { get; set; }
+    }
 
-    // --- Interfaces for Dependency Injection ---
+    // --- Interfaces ---
     public interface IAdminUserService
     {
-        CreateStaffResult CreateStaffAccount(CreateStaffRequestDto request);
-        bool SuspendUser(int userId);
-        DeleteStaffResult DeleteStaffAccount(int staffId);
+        CreateUserResult CreateUser(UserType type, UserCreationData data);
+        SuspendUserResult SuspendUser(int userId);
+        DeleteUserResult DeleteUser(int userId);
     }
-    
-    // Represents the contract for a data access layer.
+
     public interface IUserRepository
     {
         User GetUserById(int id);
@@ -43,5 +53,6 @@ namespace OrderAlReady
         void UpdateUser(User user);
         void DeleteUser(int id);
         FoodStall GetStallById(int id);
+        IEnumerable<User> GetAllUsers();
     }
 }

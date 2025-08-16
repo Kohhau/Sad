@@ -1,15 +1,10 @@
-using OrderAlReady.Models; // Assumes access to the entity classes from the previous answer
+using OrderAlReady.Models;
+using System.Linq;
 
 namespace OrderAlReady.Control
 {
-    /// <summary>
-    /// <<control>>
-    /// Implements the business logic for managing user accounts.
-    /// This is where the rules from the use case specification are enforced.
-    /// </summary>
     public class AdminUserService : IAdminUserService
     {
-        // A reference to a repository to handle data access.
         private readonly IUserRepository _userRepository;
 
         public AdminUserService(IUserRepository userRepository)
@@ -17,61 +12,85 @@ namespace OrderAlReady.Control
             _userRepository = userRepository;
         }
 
-        public CreateStaffResult CreateStaffAccount(CreateStaffRequestDto request)
+        public CreateUserResult CreateUser(UserType type, UserCreationData data)
         {
-            // E2: Invalid Data check
-            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Email))
+            if (string.IsNullOrWhiteSpace(data.Name) || string.IsNullOrWhiteSpace(data.Email))
             {
-                return new CreateStaffResult { IsSuccess = false, ErrorMessage = "Name and email are required." };
+                return new CreateUserResult { IsSuccess = false, ErrorMessage = "Name and email are required." };
             }
 
-            var stall = _userRepository.GetStallById(request.AssignedStallId);
-            if (stall == null)
+            User newUser = null;
+            switch (type)
             {
-                 return new CreateStaffResult { IsSuccess = false, ErrorMessage = "Assigned stall not found." };
+                case UserType.Student:
+                    newUser = new Student();
+                    break;
+                case UserType.PriorityStudent:
+                    newUser = new PriorityStudent();
+                    break;
+                case UserType.Staff:
+                    if (data.AssignedStallId == null)
+                    {
+                        return new CreateUserResult { IsSuccess = false, ErrorMessage = "AssignedStallId is required for Staff." };
+                    }
+                    var stall = _userRepository.GetStallById(data.AssignedStallId.Value);
+                    if (stall == null)
+                    {
+                        return new CreateUserResult { IsSuccess = false, ErrorMessage = "Assigned stall not found." };
+                    }
+                    newUser = new FoodStallStaff { AssignedStall = stall };
+                    stall.Staff.Add((FoodStallStaff)newUser);
+                    break;
             }
-            
-            // A2: Logic to create the new staff member
-            var newStaff = new FoodStallStaff
-            {
-                Name = request.Name,
-                Email = request.Email,
-                AssignedStall = stall
-            };
 
-            var createdStaff = _userRepository.AddUser(newStaff);
-            return new CreateStaffResult { IsSuccess = true, CreatedStaff = (FoodStallStaff)createdStaff };
+            if (newUser != null)
+            {
+                newUser.Name = data.Name;
+                newUser.Email = data.Email;
+                var createdUser = _userRepository.AddUser(newUser);
+                return new CreateUserResult { IsSuccess = true, CreatedUser = createdUser };
+            }
+            return new CreateUserResult { IsSuccess = false, ErrorMessage = "Invalid user type specified." };
         }
-        
-        public bool SuspendUser(int userId)
+
+        public SuspendUserResult SuspendUser(int userId)
         {
             var user = _userRepository.GetUserById(userId);
-            if (user == null || user.Status == UserStatus.Suspended)
+            if (user == null)
             {
-                return false;
+                return new SuspendUserResult { IsSuccess = false, ErrorMessage = $"User with ID {userId} not found." };
+            }
+            if (user.Status == UserStatus.Suspended)
+            {
+                return new SuspendUserResult { IsSuccess = false, ErrorMessage = "User is already suspended." };
             }
             user.Suspend();
             _userRepository.UpdateUser(user);
-            return true;
+            return new SuspendUserResult { IsSuccess = true };
         }
 
-        public DeleteStaffResult DeleteStaffAccount(int staffId)
+        public DeleteUserResult DeleteUser(int userId)
         {
-            var staffToDelete = _userRepository.GetUserById(staffId) as FoodStallStaff;
-
-            if (staffToDelete == null)
+            var userToDelete = _userRepository.GetUserById(userId);
+            if (userToDelete == null)
             {
-                return new DeleteStaffResult { IsSuccess = false, ErrorMessage = "Staff member not found." };
+                return new DeleteUserResult { IsSuccess = false, ErrorMessage = "User not found." };
+            }
+            if (userToDelete is Admin)
+            {
+                return new DeleteUserResult { IsSuccess = false, ErrorMessage = "Cannot delete an admin account." };
             }
 
-            // E1: Business rule check
-            if (staffToDelete.AssignedStall != null && staffToDelete.AssignedStall.Staff.Count == 1)
+            if (userToDelete is FoodStallStaff staff)
             {
-                return new DeleteStaffResult { IsSuccess = false, ErrorMessage = "Cannot delete the only staff member at a stall." };
+                if (staff.AssignedStall != null && staff.AssignedStall.Staff.Count == 1)
+                {
+                    return new DeleteUserResult { IsSuccess = false, ErrorMessage = "Cannot delete the only staff member at a stall." };
+                }
             }
 
-            _userRepository.DeleteUser(staffId);
-            return new DeleteStaffResult { IsSuccess = true };
+            _userRepository.DeleteUser(userId);
+            return new DeleteUserResult { IsSuccess = true };
         }
     }
 }
